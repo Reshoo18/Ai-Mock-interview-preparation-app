@@ -3,6 +3,7 @@ const express=require("express");
 const cors=require("cors");
 const path=require("path");
 const authRoutes = require("./routes/authRoutes");  
+const sessionRoutes=require('./routes/sessionRoutes.js')
 const connectDB = require("./config/db.js");
 const app=express();
 
