@@ -81,10 +81,11 @@ exports.deleteSession = async (req, res) => {
     const session = await Session.findById(req.params.id);
 
     if (!session) {
-      return res
+      return res.status(400).json({message:"Session not found"})
         .status(404)
         .json({ success: false, message: "Session not found" });
     }
+    
 
     // Optional: only allow the session owner to delete
     if (session.user.toString() !== req.user._id.toString()) {
