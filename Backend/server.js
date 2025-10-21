@@ -4,6 +4,7 @@ const cors=require("cors");
 const path=require("path");
 const authRoutes = require("./routes/authRoutes");  
 const sessionRoutes=require('./routes/sessionRoutes.js')
+const questionRoutes=require('./routes/questionRoutes.js')
 const connectDB = require("./config/db.js");
 const app=express();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth",authRoutes);
 app.use("/api/sessions",sessionRoutes);
+app.use("/api/question",questionRoutes);
 // app.use("/api/question",questionRoutes);
 // app.use("/api/ai/generate-question",protect,generateInterviewQuestion);
 // app.use("/api/ai/generate-explanation",protect,genrateConceptExplanation)
