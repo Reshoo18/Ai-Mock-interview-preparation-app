@@ -2,7 +2,7 @@
 const mongoose =require("mongoose");
 
 const questionSchema=new mongoose.Schema({
-    session:{type:mongoose.Schema.Types.ObjectId,
+    Session:{type:mongoose.Schema.Types.ObjectId,
         ref:"session"
      },
      question:String,

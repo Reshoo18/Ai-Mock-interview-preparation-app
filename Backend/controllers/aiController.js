@@ -56,7 +56,7 @@ const generateConceptExplanation = async (req, res) => {
         const { question } = req.body;
 
         if (!question) {
-            return res.status(400).json({ message: "Question is required" });
+            return res.status(400).json({ message: "Missing required fields" });
         }
 
         // Generate prompt
