@@ -19,7 +19,10 @@ const sessionSchema=new mongoose.Schema({
     description:String,
     question:[{type:mongoose.Schema.Types.ObjectId,
         ref:"Question"
-    }]
+    }],
+     questions: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Question" }
+    ],
 },{timestamps:true})
 
 

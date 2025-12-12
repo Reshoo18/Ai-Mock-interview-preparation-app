@@ -5,7 +5,7 @@ const Question = require("../models/Question");
 // Create a new session
 exports.createSession = async (req, res) => {
   try {
-    const { role, experience, topicToFocus, description, questions } = req.body;
+    const { role, experience, topicsToFocus, description, questions } = req.body;
     const userId = req.user._id;
 
     // Create the session
@@ -13,7 +13,7 @@ exports.createSession = async (req, res) => {
       user: userId,
       role,
       experience,
-      topicToFocus,
+      topicsToFocus,
       description,
     });
 
@@ -42,10 +42,10 @@ exports.createSession = async (req, res) => {
 // Get all sessions for current user
 exports.getMySessions = async (req, res) => {
   try {
-    const sessions = await Session.find({ user: req.user._id })
+    const Sessions = await Session.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .populate("questions");
-    res.status(200).json({ success: true, sessions });
+    res.status(200).json({ success: true, Sessions });
   } catch (error) {
     console.error("Error fetching sessions:", error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -53,9 +53,41 @@ exports.getMySessions = async (req, res) => {
 };
 
 // Get a session by ID
+// exports.getSessionById = async (req, res) => {
+//   try {
+//     const session = await Session.findById(req.params.id)
+//       .populate({
+//         path: "questions",
+//         options: { sort: { isPinned: -1, createdAt: 1 } },
+//       })
+//       .exec();
+
+//     if (!session) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Session not found" });
+//     }
+
+//     res.status(200).json({ success: true, session });
+//   } catch (error) {
+//     console.error("Error fetching session by ID:", error);
+//     res.status(500).json({ success: false, message: "Server Error" });
+//   }
+// };
+// controllers/sessionController.js
+
+
 exports.getSessionById = async (req, res) => {
   try {
-    const session = await Session.findById(req.params.id)
+    const { id } = req.params;
+
+    // Validate id early to avoid Mongoose CastError
+    if (!mongoose.isValidObjectId(id)) {
+      console.warn(`getSessionById - invalid id: ${id}`);
+      return res.status(400).json({ success: false, message: "Invalid session id" });
+    }
+
+    const session = await Session.findById(id)
       .populate({
         path: "questions",
         options: { sort: { isPinned: -1, createdAt: 1 } },
@@ -63,15 +95,13 @@ exports.getSessionById = async (req, res) => {
       .exec();
 
     if (!session) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Session not found" });
+      return res.status(404).json({ success: false, message: "Session not found" });
     }
 
-    res.status(200).json({ success: true, session });
+    return res.status(200).json({ success: true, session });
   } catch (error) {
     console.error("Error fetching session by ID:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    return res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
 
