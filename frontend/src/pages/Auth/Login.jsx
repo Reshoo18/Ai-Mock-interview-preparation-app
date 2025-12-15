@@ -1,3 +1,5 @@
+import { API_PATHS } from '../../utils/apiPaths';
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../component/Inputs/input';
@@ -31,7 +33,7 @@ const Login = ({setCurrentPage}) => {
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN,{
         email,password,
-
+        
       });
       const {token}=response.data;
       if(token){

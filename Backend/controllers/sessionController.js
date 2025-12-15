@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 
 const Session = require("../models/Session");
 const Question = require("../models/Question");
@@ -101,7 +102,9 @@ exports.getSessionById = async (req, res) => {
     return res.status(200).json({ success: true, session });
   } catch (error) {
     console.error("Error fetching session by ID:", error);
-    return res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    return res
+    .status(500)
+    .json({ success: false, message: "Server Error", error: error.message });
   }
 };
 
