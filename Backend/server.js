@@ -31,7 +31,7 @@ connectDB();
 //app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/sessions", sessionRoutes);
-app.use("/api/question", questionRoutes);
+app.use("/api/questions", questionRoutes);
 
 // AI Routes (protected)
 app.post("/api/ai/generate-question", protect, generateInterviewQuestion);
