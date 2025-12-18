@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState ,useContext} from 'react'
 
 import HERO_IMG from "../assets/hero-img.png";
 import { APP_FEATURES } from '../utils/data';
@@ -7,14 +7,27 @@ import { LuSparkles } from "react-icons/lu";
 import Login from './Auth/Login';
 import SignUp from './Auth/SignUp';
 import Modal from '../component/Modal';
+import { UserContext } from '../context/userContext';
+import ProfileInfoCard from '../component/Cards/profileinfoCard';
+
+
+
 
 const LandingPage = () => {
+  const {user}=useContext(UserContext);
   const navigate = useNavigate();
 
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [currentPage, setCurrentPage] = useState("login");
 
-  const handleCTA = () => {};
+  const handleCTA = () => {
+   if(!user){
+    setOpenAuthModal(true);
+   }else{
+    navigate("/dashboard")
+   }
+
+  };
 
 
   return (
@@ -24,18 +37,36 @@ const LandingPage = () => {
 
       <div className="conatiner mx-auto px-4 py-6 pb-[200px] relative z-10">
         {/* Header */}
-        <header className="flex justify-between items-center mb-16">
+        {/* <header className="flex justify-between items-center mb-16">
           <div className="text-xl text-black font-bold">
             Intervirew Prep AI
-          </div>
-            <button
+          </div> */}
+            {/* {user ? (<ProfileInfoCard/> ) : ( <button
               className="bg-linear-to-r from-[#FF9324] to-[#e99a4b] text-sm font-semibold text-white px-7 py-2.5 rounded-full hover:bg-black hover:text-white border border-white transition-colors cursor-pointer"
               onClick={() => setOpenAuthModal(true)}
             >
               Login / Signup
             </button>
-        </header>
-            {/* Hero Content */}
+          )}
+
+        </header> */}
+            <header className="flex justify-between items-center mb-16">
+  <div className="text-xl text-black font-bold">
+    Interview Prep AI
+  </div>
+
+  {user ? (
+    <ProfileInfoCard />
+  ) : (
+    <button
+      className="bg-linear-to-r from-[#FF9324] to-[#e99a4b] text-sm font-semibold text-white px-7 py-2.5 rounded-full hover:bg-black hover:text-white border border-white transition-colors cursor-pointer"
+      onClick={() => setOpenAuthModal(true)}
+    >
+      Login / Signup
+    </button>
+  )}
+</header>
+        
             <div className="flex flex-col md:flex-row items-center">
               <div className="w-full md:w-1/2 pr-4 mb-8 md:mb-0">
                 <div className="flex items-center justify-left mb-2">
@@ -152,3 +183,4 @@ const LandingPage = () => {
 };   
 
 export default LandingPage;
+
