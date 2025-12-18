@@ -5,11 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../component/Inputs/input';
 import { validateEmail } from '../../utils/helper';
 import axiosInstance from '../../utils/axiosinstance';
+import { useContext } from 'react';
+import { UserContext } from '../../context/userContext';
 
 const Login = ({setCurrentPage}) => {
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+
+  const {updateUser}=useContext(UserContext)
 
   const navigate = useNavigate();
 
@@ -38,6 +42,7 @@ const Login = ({setCurrentPage}) => {
       const {token}=response.data;
       if(token){
         localStorage.setItem('token',token);
+        updateUser(response.data)
         navigate("/dashboard")
       }
     } catch (error) {
