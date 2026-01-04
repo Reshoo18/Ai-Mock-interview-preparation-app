@@ -7,7 +7,6 @@ const router =express.Router();
 
 
 //AUTH ROUTERS
-
 router.post("/register",registerUser);
 router.post("/login",loginUser)
 router.get("/profile",protect,getUserProfile);
