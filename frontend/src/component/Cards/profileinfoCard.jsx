@@ -6,6 +6,9 @@ const ProfileInfoCard = () => {
   const { user, clearUser } = useContext(UserContext);
   const navigate = useNavigate();
 
+   if (!user) {
+     return null; // or a skeleton / loader
+  }
   const handleLogout = () => {
     localStorage.clear();
     clearUser();
@@ -34,4 +37,5 @@ const ProfileInfoCard = () => {
   );
 };
 
-export default ProfileInfoCard;
+ export default ProfileInfoCard;
+

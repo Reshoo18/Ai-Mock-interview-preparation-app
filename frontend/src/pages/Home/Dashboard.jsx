@@ -1,43 +1,135 @@
-import React, { useEffect, useState } from 'react'
-import {LuPlus} from "react-icons/lu";
-import { CARD_BG } from '../../utils/data';
-import toast from "react-hot-toast";
-import DashboardLayout from '../../component/layouts/DashboardLayout';
-import { useNavigate } from 'react-router-dom';
+// import React, { useEffect, useState } from 'react'
+// import {LuPlus} from "react-icons/lu";
+// import { CARD_BG } from '../../utils/data';
+// import toast from "react-hot-toast";
+// import DashboardLayout from '../../component/layouts/DashboardLayout';
+// import { useNavigate } from 'react-router-dom';
+// import axiosInstance from '../../utils/axiosinstance';
+// import { API_PATHS } from '../../utils/apiPaths';
+// import moment from "moment";
+// import SummaryCard from '../../component/Cards/SummaryCard';
+
+
+// const Dashboard = () => {
+//     const navigate=useNavigate();
+//     const [openCreateModal,setOpenCreateModal]=useState(false);
+//     const [Sessions,setSessions]=useState([]);
+
+//     const [openDeleteAlert,setOpenDeleteAlert]=useState({
+//         open: false,
+//         data: null,
+//     });
+
+//     const fetchAllSessions=async () =>{
+//         console.log("API RESPONSE:", response.data);
+
+//      try{
+//         const response = await axiosInstance.get(API_PATHS.SESSION.GET_ALL);
+//         setSessions(response.data?.Sessions || []);
+//      }catch(error){
+//         console.error("Error fetching seesion:",error)
+//      }
+//     };
+   
+//     const deleteSessions = async (sessionData) =>{};
+//     useEffect(()=>{
+//         fetchAllSessions();
+//     },[])
+
+//   return (
+//     <div>
+//       <DashboardLayout>
+//         <div className='container mx-auto pt-4 pb-4'>
+//             <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-7 pt-1 pb-6 px-4 md:px-0'>
+//               {
+//               Sessions?.map((data,index)=>(
+//                   <SummaryCard
+//                   key={data?._id}
+//                   colors={CARD_BG[index % CARD_BG.length].bgcolor}
+//                   role={data?.role || ""}
+//                   topicsToFocus={data?.topicsToFocus ||""}
+//                   experience={data?.experience || "-"}
+//                   questions={data?.questions?.length || "-"}
+//                   description={data?.description || ""}
+//                   lastUpdated={
+//                     data?.updatedAt
+//                     ? moment(data.updatedAt).format("Do  MMM YYYY")
+//                     : ""
+//                   }
+//                   onSelect={()=>navigate(`/interview-prep/${data?._id}`)}
+//                   onDelete={()=>setOpenDeleteAlert({open: true,data})}/>
+//               ))}
+//             </div>
+//             <button className='h-12 md:h-12 flex items-center justify-center gap-3 bg-linear-to-r
+//              from-[#63584e] to-[#e99a4b] text-sm font-semibold
+//               text-white px-7 py-2.5 rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer hover:shadow-2xl
+//                hover:shadow-orange-300 fixed bottom-10 md:bottom-20 right-10 md:right-20' onClick={()=>setOpenCreateModal(true)}>
+//                 <LuPlus className='text-2xl text-white' />
+//                 Add New
+//             </button>
+//         </div>
+//       </DashboardLayout>
+//     </div>
+//   )
+// }
+
+// export default Dashboard
+
+
+import React, { useEffect, useState } from "react";
+import DashboardLayout from "../../component/layouts/DashboardLayout";
+import axiosInstance from "../../utils/axiosinstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import SummaryCard from "../../component/Cards/SummaryCard";
+import { CARD_BG } from "../../utils/data";
+import moment from "moment";
+import { useNavigate } from "react-router-dom";
+
 const Dashboard = () => {
-    const navigate=useNavigate();
-    const [openCreateModal,setOpenCreateModal]=useState(false);
-    const [session,setSession]=useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-    const [openDeleteAlert,setOpenDeleteAlert]=useState({
-        open: false,
-        data: null,
-    });
+  const fetchSessions = async () => {
+    try {
+      const res = await axiosInstance.get(API_PATHS.SESSION.GET_ALL);
+      setSessions(res.data.sessions || []);
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const fetchAllSessions=async () =>{
-
-    };
-
-    const deleteSessions = async (sessionData) =>{};
-    useEffect(()=>{
-        fetchAllSessions();
-    },[])
+  useEffect(() => {
+    fetchSessions();
+  }, []);
 
   return (
-    <div>
-      <DashboardLayout>
-        <div className=''>
-            <div className=''>
+    <DashboardLayout>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+        {loading && <p>Loading...</p>}
 
-            </div>
-            <button className='' onClick={()=>setOpenCreateModal(true)}>
-                <LuPlus className=''/>
-                Add New
-            </button>
-        </div>
-      </DashboardLayout>
-    </div>
-  )
-}
+        {!loading && sessions.length === 0 && (
+          <p>No sessions found</p>
+        )}
 
-export default Dashboard
+        {sessions.map((s, i) => (
+          <SummaryCard
+            key={s._id}
+            colors={CARD_BG[i % CARD_BG.length].bgcolor}
+            role={s.role}
+            description={s.description}
+            lastUpdated={moment(s.updatedAt).format("Do MMM YYYY")}
+            onSelect={() => navigate(`/interview-prep/${s._id}`)}
+          />
+        ))}
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default Dashboard;
+
+
+
