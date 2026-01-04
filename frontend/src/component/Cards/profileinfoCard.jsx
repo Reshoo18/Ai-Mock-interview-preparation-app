@@ -15,8 +15,8 @@ const ProfileInfoCard = () => {
   return (
     <div className="flex items-center">
       <img
-        src={user.profileImageUrl}
-        alt=""
+        src={user.profileImageUrl || "/default-avatar.png"}
+        alt="Profile"
         className="w-11 h-11 bg-gray-300 rounded-full mr-3"
       />
       <div>
