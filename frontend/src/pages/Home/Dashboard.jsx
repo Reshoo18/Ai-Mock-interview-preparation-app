@@ -1,5 +1,5 @@
 // import React, { useEffect, useState } from 'react'
-// import {LuPlus} from "react-icons/lu";
+//import {LuPlus} from "react-icons/lu";
 // import { CARD_BG } from '../../utils/data';
 // import toast from "react-hot-toast";
 // import DashboardLayout from '../../component/layouts/DashboardLayout';
@@ -79,15 +79,25 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../component/layouts/DashboardLayout";
 import axiosInstance from "../../utils/axiosinstance";
+import {LuPlus} from "react-icons/lu";
 import { API_PATHS } from "../../utils/apiPaths";
 import SummaryCard from "../../component/Cards/SummaryCard";
+import Modal from "../../component/Modal"
 import { CARD_BG } from "../../utils/data";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import CreateSessionForm from "./CreateSessionForm";
 
 const Dashboard = () => {
   const [sessions, setSessions] = useState([]);
+
+  
+
   const [loading, setLoading] = useState(true);
+
+   const [openCreateModal, setOpenCreateModal] = useState(false);
+
+
   const navigate = useNavigate();
 
   const fetchSessions = async () => {
@@ -114,7 +124,7 @@ const Dashboard = () => {
           <p>No sessions found</p>
         )}
 
-        {sessions.map((s, i) => (
+        {/* {sessions.map((s, i) => (
           <SummaryCard
             key={s._id}
             colors={CARD_BG[i % CARD_BG.length].bgcolor}
@@ -122,9 +132,46 @@ const Dashboard = () => {
             description={s.description}
             lastUpdated={moment(s.updatedAt).format("Do MMM YYYY")}
             onSelect={() => navigate(`/interview-prep/${s._id}`)}
-          />
+          /> */}
+
+
+          {sessions.map((s, i) => (
+  <SummaryCard
+    key={s._id}
+    colors={CARD_BG[i % CARD_BG.length].bgcolor}
+    role={s.role}
+    experience={s.experience}
+    topicsToFocus={s.topicsToFocus}
+    questionsCount={s.questions?.length || 0}
+    description={s.description}
+    lastUpdated={moment(s.updatedAt).format("Do MMM YYYY")}
+    //onSelect={() => navigate(`/interview-prep/${s._id}`)}
+    onSelect={() => navigate("/interview-prep")}
+
+    onDelete={()=>setOpenDeleteAlert({open:true,data})}
+  />
+
+  
         ))}
+                  <button className='h-12 md:h-12 flex items-center justify-center gap-3 bg-linear-to-r
+            from-[#63584e] to-[#e99a4b] text-sm font-semibold
+             text-white px-7 py-2.5 rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer hover:shadow-2xl
+              hover:shadow-orange-300 fixed bottom-10 md:bottom-20 right-10 md:right-20' onClick={()=>setOpenCreateModal(true)}>
+               <LuPlus className='text-2xl text-white' />
+               Add New
+           </button>
+        
       </div>
+      <Modal isOpen={openCreateModal}
+         onClose={()=>{
+          setOpenCreateModal(false);
+         }}
+         hideHeader>
+          <div>
+           <CreateSessionForm/>
+          </div>
+         </Modal>
+
     </DashboardLayout>
   );
 };
