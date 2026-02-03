@@ -32,7 +32,7 @@ const RoleInfoHeader = ({
                      Experience: {experience} {experience ==1 ? "Year" : "Years"}
                 </div>
                   
-                  <div className=''>
+                  <div className='text-[10px] font-semibold text-white bg-black '>
                     {questions} Q&A
                      
                   </div>
