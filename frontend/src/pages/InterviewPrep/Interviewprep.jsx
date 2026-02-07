@@ -7,6 +7,8 @@ import SpinnerLoader from "../../component/Loader/SpinnerLoader"
 import {toast} from "react-hot-toast"
 import DashboardLayout from "../../component/layouts/DashboardLayout"
 import RoleInfoHeader from "./components/RoleInfoHeader"
+import axiosInstance from "../../utils/axiosinstance"
+import { API_PATHS } from "../../utils/apiPaths"
 
 
 const InterviewPrep = () => {
@@ -18,7 +20,18 @@ const InterviewPrep = () => {
   const [isLoading,setIsLoading]=useState(false);
   const [isUpdateLoader,setIsUpdateLoader]=useState(false);
 
-  const fetchSessionDetailsById=async ()=>{};
+  const fetchSessionDetailsById=async ()=>{
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.SESSION.GET_ONE(sessionId)
+      );
+      if(response.data && response.data.session){
+        sessionData(response.data.session)
+      }
+    } catch (error) {
+      console.log("Error:",error)
+    }
+  };
 
   const generateConceptExplaination=async (question)=>{};
 

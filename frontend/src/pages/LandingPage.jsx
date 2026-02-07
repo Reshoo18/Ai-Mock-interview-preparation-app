@@ -8,7 +8,7 @@ import Login from './Auth/Login';
 import SignUp from './Auth/SignUp';
 import Modal from '../component/Modal';
 import { UserContext } from '../context/userContext';
-import ProfileInfoCard from '../component/Cards/profileinfoCard';
+import ProfileInfoCard from '../component/Cards/ProfileInfoCard';
 
 
 
