@@ -12,7 +12,7 @@ import { API_PATHS } from "../../utils/apiPaths"
 
 
 const InterviewPrep = () => {
-  const {sessionId}=useParams();
+  const {id}=useParams();
   const [sessionData,setSessionData]=useState(null);
   const [errorMsg,setError]=useState("");
 
@@ -23,10 +23,10 @@ const InterviewPrep = () => {
   const fetchSessionDetailsById=async ()=>{
     try {
       const response = await axiosInstance.get(
-        API_PATHS.SESSION.GET_ONE(sessionId)
+        API_PATHS.SESSION.GET_ONE(id)
       );
       if(response.data && response.data.session){
-        sessionData(response.data.session)
+        setSessionData(response.data.session)
       }
     } catch (error) {
       console.log("Error:",error)
@@ -41,7 +41,7 @@ const InterviewPrep = () => {
   const uploadMoreQuestions=async()=>{};
 
   useEffect(()=>{
-    if(sessionId){
+    if(id){
       fetchSessionDetailsById();
     }
     return ()=>{};

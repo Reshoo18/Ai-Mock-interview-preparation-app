@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../component/layouts/DashboardLayout";
 import axiosInstance from "../../utils/axiosinstance";
@@ -22,13 +24,25 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  // FETCH SESSIONS
+  // ✅ FETCH SESSIONS
   const fetchSessions = async () => {
     try {
       const res = await axiosInstance.get(API_PATHS.SESSION.GET_ALL);
-      setSessions(res.data.sessions || []);
+
+      console.log("API response:", res.data);
+
+      // Normalize response into array
+      if (Array.isArray(res.data.sessions)) {
+        setSessions(res.data.sessions);
+      } else if (res.data.session) {
+        setSessions([res.data.session]);
+      } else {
+        setSessions([]);
+      }
+
     } catch (err) {
       console.error("Error fetching sessions:", err);
+      setSessions([]);
     } finally {
       setLoading(false);
     }
@@ -38,41 +52,20 @@ const Dashboard = () => {
     fetchSessions();
   }, []);
 
-  // 🔥 DELETE FUNCTION (THIS WAS MISSING)
-  // const handleDeleteSession = async () => {
-  //   try {
-  //     const id = openDeleteAlert.data._id;
+  // ✅ DELETE SESSION
+  const handleDeleteSession = async () => {
+    try {
+      const id = openDeleteAlert.data._id;
 
-  //     console.log("Deleting ID:", id);
+      await axiosInstance.delete(API_PATHS.SESSION.DELETE(id));
 
-  //     await axiosInstance.delete(`/sessions/${id}`);
+      setOpenDeleteAlert({ open: false, data: null });
 
-  //     // Close modal
-  //     setOpenDeleteAlert({ open: false, data: null });
-
-  //     // Refresh list
-  //     fetchSessions();
-
-  //   } catch (err) {
-  //     console.error("Delete error:", err);
-  //   }
-  // };
-   const handleDeleteSession = async () => {
-  try {
-    const id = openDeleteAlert.data._id;
-
-    await axiosInstance.delete(
-      API_PATHS.SESSION.DELETE(id)
-    );
-
-    setOpenDeleteAlert({ open: false, data: null });
-
-    fetchSessions();
-
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
-};
+      fetchSessions();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -94,7 +87,7 @@ const Dashboard = () => {
             questionsCount={s.questions?.length || 0}
             description={s.description}
             lastUpdated={moment(s.updatedAt).format("Do MMM YYYY")}
-            onSelect={() => navigate("/interview-prep")}
+            onSelect={() => navigate(`/interview-prep/${s._id}`)}
             onDelete={() =>
               setOpenDeleteAlert({
                 open: true,
@@ -104,7 +97,7 @@ const Dashboard = () => {
           />
         ))}
 
-        {/* ADD NEW BUTTON */}
+        {/* ✅ ADD NEW BUTTON */}
         <button
           className="h-12 flex items-center justify-center gap-3 bg-orange-500 text-white px-7 py-2.5 rounded-full fixed bottom-20 right-20"
           onClick={() => setOpenCreateModal(true)}
@@ -114,16 +107,16 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* CREATE MODAL */}
+      {/* ✅ CREATE MODAL */}
       <Modal
         isOpen={openCreateModal}
         onClose={() => setOpenCreateModal(false)}
         hideHeader
       >
-        <CreateSessionForm />
+        <CreateSessionForm onSuccess={fetchSessions} />
       </Modal>
 
-      {/* 🔥 DELETE MODAL */}
+      {/* ✅ DELETE MODAL */}
       <Modal
         isOpen={openDeleteAlert.open}
         onClose={() => setOpenDeleteAlert({ open: false, data: null })}
@@ -159,3 +152,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
