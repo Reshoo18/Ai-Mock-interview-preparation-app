@@ -1,11 +1,79 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-const QuestionCard = () => {
-  return (
-    <div>
-      QuestionCard
-    </div>
-  )
-}
+import {LuChevronDown,LuPin,LuPinOff,LuSparkles} from 'react-icons/lu'
 
-export default QuestionCard
+const QuestionCard =({
+  question,
+  answer,
+  onLearnMore,
+  isPinned,
+  onTogglePin
+})=>{
+  const [isExpanded,setIsExpanded]=useState(false);
+  const [height,setHeight]=useState(0);
+  const contentRef=useRef(null);
+  useEffect(()=>{
+    if(isExpanded){
+      const contentHeight=contentRef.current.scrolHeight;
+      setHeight(contentHeight +10);
+    }else{
+      setHeight(0);
+    }
+  },[isExpanded]);
+
+  const toggleExpand=()=>{
+    setIsExpanded(!isExpanded)
+  }
+    return <>
+    <div className='bg-white rounded-lg mb-4 overflow-hidden px-5 shadow-xl shadow-gray-100/70 border border-gray-100/60 group'>
+       <div className='flex items-start justify-between cursor-pointer'>
+        <div className='flex items-start gap-3.5'>
+          <span className='text-xs md:text-[15px] font-semibold text-gray-400 leading-[18px]'>Q</span>
+          <h3 className='text-xs md:text-[14px] font-medium text-gray 800 mr-0 md:mr-20' onClick={toggleExpand}>
+              {question}
+          </h3>
+        </div>
+
+        <div className='flex items-center justify-end ml-4 relative'></div>
+        <div className={`flex ${
+        isExpanded ? "md:flex":"nd:hidden group-hover:flex"}`}>
+          <button className='' onClick={onTogglePin}>
+            {isPinned ?(
+              <LuPinOff className=''/>
+            ):(
+              <LuPin className='' />
+            )}
+          </button>
+
+          <button className='' onClick={()=>{
+            setIsExpanded(true);
+            onLearnMore();
+          }}>
+            <LuSparkles/>
+            <span className=''>Learn More</span>
+     
+          </button>
+
+        </div>
+          <button className='' onClick={toggleExpand}>
+             <LuChevronDown
+             size={20}
+             className={`transform transition-transform duration-300 ${
+              isExpanded ? "rotate-180" :""
+             }`}
+             />
+          </button>
+        </div>
+        </div>
+
+        <div className='' style={{maxHeight: `${height}px`}}>
+          <div ref={contentRef} className=''>
+
+          </div>
+        </div>
+        
+        </>
+};
+      
+
+export default QuestionCard;
