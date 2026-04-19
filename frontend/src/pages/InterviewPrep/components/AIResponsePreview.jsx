@@ -2,14 +2,14 @@ import React from 'react'
 import {LuCopy,LuCheck,LuCode} from "react-icons/lu"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
-import {Prism as SyntaxHightlighter} from 'react-syntax-highlighter'
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const AIResponsePreview = ({content}) => {
     if(!content) return null
   return (
     <div className='max-w-4xl mx-auto'>
-        <div className='text-[14px] prose prose-slate dark:prose-invert max-w-none'>
+        <div className='text-[14px] prose prose-slate dark:prose-invert m ax-w-none'>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -84,7 +84,11 @@ const AIResponsePreview = ({content}) => {
 
 
               }}
-              ></ReactMarkdown>
+              
+              >
+              {content}
+              </ReactMarkdown>
+              
         </div>
      
     </div>
