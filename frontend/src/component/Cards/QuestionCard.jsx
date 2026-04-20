@@ -39,7 +39,11 @@ const QuestionCard =({
         <div className='flex items-center justify-end ml-4 relative'>
         <div className={`flex ${
         isExpanded ? "md:flex":"nd:hidden group-hover:flex"}`}>
-          <button className='flex items-center gap-2 text-xs text-indigo-800 font-medium bg-indigo-50 px-3 py-1 mr-2 rounded text-nowrap border border-indigo-50 hover:border-indigo-200 cursor-pointer' onClick={onTogglePin}>
+          <button  className='flex items-center gap-2 text-xs text-indigo-800 font-medium bg-indigo-50 px-3 py-1 mr-2 rounded text-nowrap border border-indigo-50 hover:border-indigo-200 cursor-pointer'
+  onClick={(e) => {
+    e.stopPropagation();   // 🔥 IMPORTANT
+    onTogglePin();
+  }}>
             {isPinned ?(
               <LuPinOff className='text-xs'/>
             ):(

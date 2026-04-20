@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {LuCopy,LuCheck,LuCode} from "react-icons/lu"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
@@ -13,6 +13,25 @@ const AIResponsePreview = ({content}) => {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
+                code({node,className,children, ...props}){
+                    const match=/language-(\w+)/.exec(className || '')
+                    const language=match ? match[1] : ''
+
+                    const isInline = !className
+
+                    return !isInline ? (
+                        <CodeBlock
+                         code={String(children).replace(/\n$/, '')}
+                         language={language}
+                         />
+                    ) : (
+                        <code className='px-1 py-0.5 bg-gray-100 rounded text-sm' {...props}>
+                            {children}
+                        </code>
+                    )
+                    
+                },
+
                 p({children}){
                     return <p className='mb-4 leading-5'>{children}</p>;
                 },
@@ -94,5 +113,102 @@ const AIResponsePreview = ({content}) => {
     </div>
   )
 }
+
+// function CodeBlock({code,language}){
+//     const [copied,setCopied]=useState(false);
+
+//     const copyCode=()=>{
+//         navigator.clipboard.writeText(code);
+//         setCopied(true);
+//         setTimeout(()=>setCopied(false),2000)
+//     }
+//     return <div className='relative my-6 rounded-lg overflow-hidden bg-gray-50 border-gray-200'>
+//            <div className='flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200'>
+//             <div className=''>
+//                 <LuCode size={16} className='' />
+//                  <span className=''>
+//                     {language || 'code'}
+//                  </span>
+//             </div>
+//               <button onClick={copyCode}
+//               className=''
+//               arial-lable="Copy code">
+//                {copied ?(
+//                 <LuCode size={16} className='' />
+//                ):(
+//                 <LuCode size={16} />
+//                )}
+//                {copied && (
+//                 <span className=''>
+//                     Copied!
+//                 </span>
+                 
+//                )}
+
+//               </button>
+
+//            </div>
+//            <SyntaxHighlighter
+//            language={language}
+//            style={oneLight}
+//            customStyle={{fontSize:12.5,margin:0,padding:'items',background:'transparent'}}>
+//             {code}
+//            </SyntaxHighlighter>
+//     </div>
+//}
+const CodeBlock = ({ code, language }) => {
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative my-6 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200">
+        <div className="flex items-center gap-2 text-xs font-medium text-gray-600 uppercase">
+          <LuCode size={16} />
+          {language || "code"}
+        </div>
+
+        <button
+          onClick={copyCode}
+          className="flex items-center gap-1 text-xs text-gray-600 hover:text-black transition"
+          aria-label="Copy code"
+        >
+          {copied ? (
+            <>
+              <LuCheck size={14} />
+              Copied
+            </>
+          ) : (
+            <>
+              <LuCopy size={14} />
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Code */}
+      <SyntaxHighlighter
+        language={language}
+        style={oneLight}
+        customStyle={{
+          margin: 0,
+          padding: "16px",
+          fontSize: "13px",
+          background: "transparent",
+        }}
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+};
 
 export default AIResponsePreview
