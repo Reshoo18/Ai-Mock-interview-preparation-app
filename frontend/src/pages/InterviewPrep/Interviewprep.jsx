@@ -15,12 +15,18 @@ import { API_PATHS } from "../../utils/apiPaths";
 import { LuCircleAlert } from "react-icons/lu";
 import AIResponsePreview from "./components/AIResponsePreview";
 import Drawer from "../../component/Drawer";
+import SkeletonLoader from "../../component/Loader/SkeletonLoader";
 
 const InterviewPrep = () => {
   const { id } = useParams();
-
+  
+  const [openLearnMoreDrawer, setOpenLearnMoreDrawer] = useState(false);
+  const [explanation, setExplanation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
   const [sessionData, setSessionData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
 
   /* =========================
      FETCH SESSION
@@ -39,6 +45,34 @@ const InterviewPrep = () => {
       console.log("FETCH ERROR:", err);
     }
   };
+
+  const generateConceptExplantion=async (question)=>{
+    try{
+      setErrorMsg("")
+      setExplanation(null)
+
+      setIsLoading(true);
+      setOpenLearnMoreDrawer(true)
+
+       const response = await axiosInstance.post(
+        API_PATHS.AI.GENERATE_EXPLANATION,
+        {
+          question,
+        }
+       );
+
+       if(response.data){
+        setExplanation(response.data)
+       }
+    }catch (error) {
+      setExplanation(null)
+      setErrorMsg("Failed to generate explaination, try again later");
+      console.log("ERROR",error)
+    }finally{
+      setIsLoading(false);
+    }
+  }
+
 
   /* =========================
      GENERATE QUESTIONS
@@ -240,6 +274,9 @@ function Counter() {
 - State updates are asynchronous
 - Always use setter function
 `}
+  onLearnMore={()=>
+    generateConceptExplantion(data.question)
+  }
   isPinned={data.isPinned}
   onTogglePin={() => toggleQuestionPinStatus(data._id)}
 />
@@ -253,18 +290,19 @@ function Counter() {
          <div>
             <Drawer
              isOpen={openLearnMoreDrawer}
-             onClose={()=>setOpenLearnMoreDrawer(false)}
+             onclose={()=>setOpenLearnMoreDrawer(false)}
              title={!isLoading && explanation?.title}>
                {errorMsg && (
                 <p className="flex gap-2 text-sm text-amber-600" font-medium>
-                  <LuCircleAlert className="mt-1 "/>{errorMsg}
+                  <LuCircleAlert className="mt-1"/>{errorMsg}
                 </p>
                )}
+               {isLoading && <SkeletonLoader />}
                {!isLoading && explanation && (
                 <AIResponsePreview content={explanation?.explanation}/>
                )}
 
-             </Dr>
+             </Drawer>
          </div>
       </div>
     </DashboardLayout>
