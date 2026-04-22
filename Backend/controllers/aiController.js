@@ -1,120 +1,195 @@
-const { questionAnswerPrompt, conceptExplainPrompt } = require("../utils/prompts");
-const { GoogleGenAI } = require("@google/genai");
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const fetch = global.fetch;
 
 /* ============================
-   Generate Interview Questions
+   GENERATE INTERVIEW QUESTIONS
 ============================ */
-
-const generateInterviewQuestion = async (req, res) => {
+exports.generateInterviewQuestion = async (req, res) => {
   try {
-    let { role, experience, topicsToFocus, numberOfQuestions } = req.body;
+    const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
-    if (!role || !experience || !topicsToFocus || !numberOfQuestions) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    console.log("🚀 Groq generating for:", role);
 
-    if (Array.isArray(topicsToFocus)) {
-      topicsToFocus = topicsToFocus.join(", ");
-    }
+    const prompt = `
+Return ONLY valid JSON array.
 
-    const prompt = questionAnswerPrompt(
-      role,
-      experience,
-      topicsToFocus,
-      numberOfQuestions
+NO explanation. NO extra text.
+
+Format:
+[
+  { "question": "string", "answer": "string" }
+]
+
+Generate ${numberOfQuestions} UNIQUE interview questions.
+
+Role: ${role}
+Experience: ${experience}
+Topics: ${topicsToFocus}
+`;
+
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+        }),
+      }
     );
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", // ✅ FIXED
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
-    });
+    // ✅ Check HTTP error
+    if (!response.ok) {
+      const errText = await response.text();
+      console.log("❌ HTTP ERROR:", errText);
+      throw new Error("Groq request failed");
+    }
 
-    const rawText =
-      response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const result = await response.json();
 
-    const cleanedText = rawText
-      .replace(/^```json\s*/, "")
-      .replace(/```$/, "")
-      .trim();
+    console.log("FULL GROQ RESPONSE:", result);
+
+    // ❌ API error
+    if (result.error) {
+      console.log("❌ GROQ API ERROR:", result.error);
+      throw new Error(result.error.message);
+    }
+
+    const rawText = result?.choices?.[0]?.message?.content;
+
+    if (!rawText) {
+      console.log("❌ Empty response from Groq");
+      throw new Error("Empty response");
+    }
+
+    console.log("🔥 RAW:", rawText);
 
     let data;
 
     try {
-      data = JSON.parse(cleanedText);
-    } catch {
-      data = { text: cleanedText };
+      // ✅ Extract JSON safely
+      const start = rawText.indexOf("[");
+      const end = rawText.lastIndexOf("]");
+
+      if (start !== -1 && end !== -1) {
+        const json = rawText.slice(start, end + 1);
+        data = JSON.parse(json);
+      } else {
+        throw new Error("No JSON found");
+      }
+    } catch (err) {
+      console.log("⚠️ JSON parsing failed → using fallback");
+      data = fallback(role, topicsToFocus, numberOfQuestions);
     }
 
-    res.status(200).json(data);
+    return res.status(200).json(data);
 
   } catch (error) {
-    console.error("GenAI error:", error);
-    res.status(500).json({
-      message: "Failed to generate question",
-      error: error.message,
-    });
+    console.error("🔥 GROQ ERROR:", error.message);
+
+    return res.status(200).json(
+      fallback("Developer", "General", 10)
+    );
   }
 };
 
-/* ============================
-   Generate Explanation
-============================ */
 
-const generateConceptExplanation = async (req, res) => {
+/* ============================
+   GENERATE EXPLANATION
+============================ */
+exports.generateConceptExplanation = async (req, res) => {
   try {
     const { question } = req.body;
 
-    if (!question) {
-      return res.status(400).json({ message: "Missing required fields" });
+    console.log("🚀 Groq explanation...");
+
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: [
+            {
+              role: "user",
+              content: `Explain this interview question clearly:\n${question}`,
+            },
+          ],
+          temperature: 0.6,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Groq explanation failed");
     }
 
-    const prompt = conceptExplainPrompt(question);
+    const result = await response.json();
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", // ✅ FIXED
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
+    const explanation =
+      result?.choices?.[0]?.message?.content ||
+      "No explanation available";
+
+    return res.status(200).json({
+      title: question,
+      explanation,
     });
 
-    const rawText =
-      response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-    const cleanedText = rawText
-      .replace(/^```json\s*/, "")
-      .replace(/```$/, "")
-      .trim();
-
-    let data;
-
-    try {
-      data = JSON.parse(cleanedText);
-    } catch {
-      data = { text: cleanedText };
-    }
-
-    res.status(200).json(data);
-
   } catch (error) {
-    console.error("GenAI error:", error);
-    res.status(500).json({
-      message: "Failed to generate explanation",
-      error: error.message,
+    console.error("🔥 GROQ ERROR:", error.message);
+
+    return res.status(200).json({
+      title: req.body.question,
+      explanation: "Failed to generate explanation",
     });
   }
 };
 
-module.exports = {
-  generateInterviewQuestion,
-  generateConceptExplanation,
+
+/* ============================
+   FALLBACK (SAFE GENERATOR)
+============================ */
+const fallback = (role, topics, count = 10) => {
+  let topicList = topics.includes(",")
+    ? topics.split(",")
+    : topics.split(" ");
+
+  topicList = topicList.map((t) => t.trim()).filter(Boolean);
+
+  const questions = [];
+
+  const templates = [
+    "What is",
+    "Explain",
+    "Why is",
+    "How does",
+    "What are advantages of",
+    "Real-world use of",
+    "Common mistakes in",
+    "Explain lifecycle of",
+    "How to optimize",
+    "Advanced concept of"
+  ];
+
+  for (let i = 0; i < count; i++) {
+    const topic = topicList[i % topicList.length];
+    const template = templates[i % templates.length];
+
+    questions.push({
+      question: `${template} ${topic} in ${role}?`,
+      answer: `${topic} is an important concept in ${role}. It is widely used in real-world applications and helps build scalable systems.`,
+    });
+  }
+
+  return questions;
 };

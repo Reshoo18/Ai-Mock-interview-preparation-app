@@ -145,11 +145,60 @@ const Question = require("../models/Question");
 // ===============================
 // Create a new session
 // ===============================
+const axios = require("axios");
+
 exports.createSession = async (req, res) => {
   try {
-    const { role, experience, topicsToFocus, description, questions } = req.body;
+    const { role, experience, topicsToFocus, description } = req.body;
     const userId = req.user._id;
 
+    // 🔥 STEP 1: Generate AI Questions
+    const prompt = `
+Generate 5 interview questions and answers in JSON format:
+
+[
+ { "question": "...", "answer": "..." }
+]
+
+Role: ${role}
+Experience: ${experience}
+Topics: ${topicsToFocus}
+`;
+
+    let aiQuestions = [];
+
+    try {
+      const response = await axios.post(
+        "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
+        { inputs: prompt },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+          },
+        }
+      );
+
+      const text = response.data?.[0]?.generated_text || "";
+
+      const start = text.indexOf("[");
+      const end = text.lastIndexOf("]") + 1;
+      const json = text.slice(start, end);
+
+      aiQuestions = JSON.parse(json);
+
+    } catch (err) {
+      console.log("⚠️ AI failed → using fallback");
+
+      aiQuestions = [
+        { question: "What is React state?", answer: "State manages UI data." },
+        { question: "Explain Virtual DOM", answer: "Improves performance." },
+        { question: "What is useEffect?", answer: "Handles side effects." },
+        { question: "What is JSX?", answer: "JS syntax for UI." },
+        { question: "What is props?", answer: "Pass data between components." },
+      ];
+    }
+
+    // 🔥 STEP 2: Create session
     const session = await Session.create({
       user: userId,
       role,
@@ -158,28 +207,26 @@ exports.createSession = async (req, res) => {
       description,
     });
 
-    if (Array.isArray(questions) && questions.length > 0) {
-      const questionDocs = await Promise.all(
-        questions.map(async (q) => {
-          const newQuestion = await Question.create({
-            session: session._id,
-            question: q.question,
-            answer: q.answer,
-          });
-          return newQuestion._id;
-        })
-      );
+    // 🔥 STEP 3: Save questions
+    const createdQuestions = await Question.insertMany(
+      aiQuestions.map((q) => ({
+        session: session._id,
+        question: q.question,
+        answer: q.answer,
+      }))
+    );
 
-      session.questions = questionDocs;
-      await session.save();
-    }
+    // 🔥 STEP 4: Link to session
+    session.questions = createdQuestions.map((q) => q._id);
+    await session.save();
 
     return res.status(201).json({
       success: true,
       session,
     });
+
   } catch (error) {
-    console.error("Error creating session:", error);
+    console.error("Create session error:", error);
     return res.status(500).json({
       success: false,
       message: "Server Error",

@@ -1,70 +1,104 @@
-const Question=require("../models/Question");
-const Session=require("../models/Session");
+const Question = require("../models/Question");
+const Session = require("../models/Session");
 
+/* ============================
+   ADD QUESTIONS TO SESSION
+============================ */
+exports.addQuestionsToSession = async (req, res) => {
+  try {
+    const { sessionId, questions } = req.body;
 
-
-
-exports.addQuestionsToSession=async(req,res)=>{
-    try{
-   const {sessionId,questions:questions}=req.body;
-
-   if(!sessionId || !questions|| !Array.isArray(questions)){
-    return res.status(400).json({message: "invalid inpute data"})
-   }
-   const session =await Session.findById(sessionId);
-   if(!session){
-    return res.status(404).json({mession : "Session not found"});
-   }
-
-   const createdQuestions = await Question.insertMany(
-       questions.map((q)=>({
-        session:sessionId,
-        question:q.question,
-        answer:q.answer,
-       }))
-    );
-    }catch(errror){
-      res.status(500).json({message:"Server Error"});
+    if (!sessionId || !questions || !Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input data",
+      });
     }
+
+    const session = await Session.findById(sessionId);
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Session not found",
+      });
+    }
+
+    // 🚨 IMPORTANT: Remove old questions (prevents mixing)
+    await Question.deleteMany({ _id: { $in: session.questions } });
+
+    // Clear existing references
+    session.questions = [];
+
+    // ✅ Create new questions
+    const createdQuestions = await Question.insertMany(
+      questions.map((q) => ({
+        question: q.question,
+        answer: q.answer,
+        isPinned: false,
+      }))
+    );
+
+    // ✅ Save new question IDs
+    const questionIds = createdQuestions.map((q) => q._id);
+
+    session.questions = questionIds;
+    await session.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Questions added successfully",
+      questions: createdQuestions,
+    });
+
+  } catch (error) {
+    console.error("ADD QUESTIONS ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
 };
 
-exports.togglePinQuestion=async(req,res)=>{
-    try{
-       const question = await Question.findById(req.params.id);
-       if(!question){
-        return res
-        .status(404)
-        .json({success: flase,message:"Question not found"})
-       }
-       Question.isPinned=!question.isPinned
-       await question.save();
+/* ============================
+   TOGGLE PIN QUESTION
+============================ */
+exports.togglePinQuestion = async (req, res) => {
+  try {
+    const question = await Question.findById(req.params.id);
 
-       res.status(200).json({success: true,question})
-    }catch(error){
-     res.status(500).json({message:"Server Error"});
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: "Question not found",
+      });
     }
-}
 
-// exports.updateQuestionNote=async(req,res)=>{
-//      try{
-//         const {note}=req.body;
-//         const question = await Question.findById(req.params.id);
+    // ✅ Correct toggle
+    question.isPinned = !question.isPinned;
 
-//         if(!question){
-//             return res.status(400)
-//             .json({success: false,message: "Question not found"})
-//         }
-//         question.note=note || "";
-//         await question.save();
+    await question.save();
 
-//         res.status(200).json({success: true,question});
-//     }catch(error){
-//      res.status(500).json({message:"Server Error"});
-//     }
-// }
+    return res.status(200).json({
+      success: true,
+      question,
+    });
+
+  } catch (error) {
+    console.error("PIN ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+/* ============================
+   UPDATE QUESTION NOTE
+============================ */
 exports.updateQuestionNote = async (req, res) => {
   try {
-    const { note } = req.body || {};
+    const { note } = req.body;
 
     if (note === undefined) {
       return res.status(400).json({
@@ -85,9 +119,16 @@ exports.updateQuestionNote = async (req, res) => {
     question.note = note;
     await question.save();
 
-    res.status(200).json({ success: true, question });
+    return res.status(200).json({
+      success: true,
+      question,
+    });
+
   } catch (error) {
-    console.error("updateQuestionNote error:", error);
-    res.status(500).json({ message: "Server Error" });
+    console.error("NOTE ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
   }
 };
