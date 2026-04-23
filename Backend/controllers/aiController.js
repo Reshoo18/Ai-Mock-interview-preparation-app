@@ -2,6 +2,7 @@
 
 const fetch = global.fetch;
 
+
 /* ============================
    GENERATE INTERVIEW QUESTIONS
 ============================ */
@@ -98,7 +99,6 @@ Topics: ${topicsToFocus}
     );
   }
 };
-
 
 /* ============================
    GENERATE EXPLANATION

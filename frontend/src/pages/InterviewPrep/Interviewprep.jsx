@@ -51,7 +51,7 @@ const InterviewPrep = () => {
           role: session.role,
           experience: session.experience,
           topicsToFocus: session.topicsToFocus,
-          numberOfQuestions: 5,
+          numberOfQuestions: 10,
         }
       );
 
@@ -162,7 +162,7 @@ const InterviewPrep = () => {
         }
       />
 
-      <div className="container mx-auto pt-4 pb-4">
+      <motion.div className="container mx-auto pt-4 pb-4">
         <h2 className="text-lg font-semibold">
           Interview Q & A
         </h2>
@@ -183,7 +183,7 @@ const InterviewPrep = () => {
             />
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Drawer */}
       <Drawer
@@ -204,3 +204,190 @@ const InterviewPrep = () => {
 };
 
 export default InterviewPrep;
+
+// import React, { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+// import moment from "moment";
+
+// import SpinnerLoader from "../../component/Loader/SpinnerLoader";
+// import DashboardLayout from "../../component/layouts/DashboardLayout";
+// import RoleInfoHeader from "./components/RoleInfoHeader";
+// import QuestionCard from "../../component/Cards/QuestionCard";
+
+// import axiosInstance from "../../utils/axiosinstance";
+// import { API_PATHS } from "../../utils/apiPaths";
+// import AIResponsePreview from "./components/AIResponsePreview";
+// import Drawer from "../../component/Drawer";
+// import SkeletonLoader from "../../component/Loader/SkeletonLoader";
+
+// const InterviewPrep = () => {
+//   const { id } = useParams();
+
+//   const [sessionData, setSessionData] = useState(null);
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const [openLearnMoreDrawer, setOpenLearnMoreDrawer] = useState(false);
+//   const [explanation, setExplanation] = useState(null);
+//   const [errorMsg, setErrorMsg] = useState("");
+
+//   /* ================= FETCH SESSION ================= */
+//   const fetchSessionDetailsById = async () => {
+//     try {
+//       const res = await axiosInstance.get(
+//         API_PATHS.SESSION.GET_ONE(id)
+//       );
+
+//       setSessionData(res.data.session);
+//     } catch (err) {
+//       console.log("FETCH ERROR:", err);
+//     }
+//   };
+
+//   /* ================= GENERATE AI QUESTIONS ================= */
+//   const generateQuestions = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       await axiosInstance.post(
+//         API_PATHS.AI.GENERATE_QUESTION,
+//         {
+//           role: sessionData.role,
+//           experience: sessionData.experience,
+//           topicsToFocus: sessionData.topicsToFocus,
+//           numberOfQuestions: 10,
+//         }
+//       );
+       
+//       // 🔥 Refetch updated session (keeps old + new questions)
+//       await fetchSessionDetailsById();
+
+//     } catch (err) {
+//       console.log("GEN ERROR:", err);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   /* ================= GENERATE EXPLANATION ================= */
+//   const generateConceptExplanation = async (question) => {
+//     try {
+//       setIsLoading(true);
+//       setOpenLearnMoreDrawer(true);
+//       setErrorMsg("");
+//       setExplanation(null);
+
+//       const res = await axiosInstance.post(
+//         API_PATHS.AI.GENERATE_EXPLAINATION,
+//         { question }
+//       );
+
+//       setExplanation(res.data);
+//     } catch (err) {
+//       setErrorMsg("Failed to generate explanation");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   /* ================= PIN ================= */
+//   const toggleQuestionPinStatus = async (id) => {
+//     await axiosInstance.post(API_PATHS.QUESTIONS.PIN(id));
+
+//     setSessionData((prev) => ({
+//       ...prev,
+//       questions: prev.questions.map((q) =>
+//         q._id === id ? { ...q, isPinned: !q.isPinned } : q
+//       ),
+//     }));
+//   };
+
+//   /* ================= LOAD SESSION ================= */
+//   useEffect(() => {
+//     if (id) fetchSessionDetailsById();
+//   }, [id]);
+
+//   /* ================= UI ================= */
+//   if (!sessionData) {
+//     return (
+//       <DashboardLayout>
+//         <SpinnerLoader />
+//       </DashboardLayout>
+//     );
+//   }
+
+//   return (
+//     <DashboardLayout>
+//       <RoleInfoHeader
+//         role={sessionData.role}
+//         topicsToFocus={sessionData.topicsToFocus}
+//         experience={sessionData.experience}
+//         question={sessionData.questions.length}
+//         description={sessionData.description}
+//         lastUpdated={
+//           sessionData.updatedAt
+//             ? moment(sessionData.updatedAt).format("Do MMM YYYY")
+//             : ""
+//         }
+//       />
+
+//       <div className="container mx-auto pt-4 pb-4">
+//         <h2 className="text-lg font-semibold">
+//           Interview Q & A
+//         </h2>
+
+//         {/* QUESTIONS */}
+//         <div className="mt-5">
+//           {sessionData.questions.map((q) => (
+//             <QuestionCard
+//               key={q._id}
+//               question={q.question}
+//               answer={q.answer}
+//               isPinned={q.isPinned}
+//               onTogglePin={() =>
+//                 toggleQuestionPinStatus(q._id)
+//               }
+//               onLearnMore={() =>
+//                 generateConceptExplanation(q.question)
+//               }
+//             />
+//           ))}
+//         </div>
+
+//         {/* 🔥 LOAD MORE BUTTON */}
+//         <div className="flex justify-center mt-6">
+//           <button
+//             onClick={generateQuestions}
+//             disabled={isLoading}
+//             className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+//           >
+//             {isLoading ? "Generating..." : "Load More Questions"}
+//           </button>
+//         </div>
+
+//         {/* 🔄 LOADER */}
+//         {isLoading && (
+//           <div className="flex justify-center mt-4">
+//             <SpinnerLoader />
+//           </div>
+//         )}
+//       </div>
+
+//       {/* DRAWER */}
+//       <Drawer
+//         isOpen={openLearnMoreDrawer}
+//         onclose={() => setOpenLearnMoreDrawer(false)}
+//         title={explanation?.title}
+//       >
+//         {errorMsg && <p>{errorMsg}</p>}
+//         {isLoading && <SkeletonLoader />}
+//         {!isLoading && explanation && (
+//           <AIResponsePreview
+//             content={explanation.explanation}
+//           />
+//         )}
+//       </Drawer>
+//     </DashboardLayout>
+//   );
+// };
+
+// export default InterviewPrep;
