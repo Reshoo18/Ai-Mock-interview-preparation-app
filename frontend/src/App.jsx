@@ -47,7 +47,10 @@ import Dashboard from "./pages/Home/Dashboard";
 import InterviewPrep from "./pages/InterviewPrep/Interviewprep";
 import LandingPage from "./pages/LandingPage";
 import VideoCall from "./pages/VideoCall"; // 🔥 ADD THIS
+import MeetingPage from "./pages/MeetingPage";
 import UserProvider from './context/userContext';
+import InterviewSession from "./pages/InterviewSession.jsx";
+
 
 const App = () => {
   return (
@@ -67,6 +70,8 @@ const App = () => {
 
           {/* 🔥 VIDEO CALL ROUTE */}
           <Route path="/call/:sessionId" element={<VideoCall />} />
+          <Route path="/meeting" element={<MeetingPage />} />
+          <Route path="/interview/start/:id" element={<InterviewSession />} />
 
         </Routes>
 
