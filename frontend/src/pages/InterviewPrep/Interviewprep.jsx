@@ -239,7 +239,8 @@ return (
 
       {/* QUESTIONS */}
       <div className="mt-5 space-y-4">
-        {sessionData.questions.map((q) => (
+        {sessionData.questions  .sort((a, b) => b.isPinned - a.isPinned)
+.map((q) => (
            
           <div key={q._id} className="hover:scale-[1.01] transition-all duration-200">
             <QuestionCard
@@ -296,4 +297,3 @@ return (
 );
 };
 export default InterviewPrep;
-

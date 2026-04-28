@@ -457,7 +457,11 @@ const Dashboard = () => {
               questionsCount={s.questions?.length || 0}
               description={s.description}
               lastUpdated={moment(s.updatedAt).format("Do MMM YYYY")}
-              onSelect={() => navigate(`/interview-prep/${s._id}`)}
+              // onSelect={() => navigate(`/interview-prep/${s._id}`)}
+              onSelect={() => {
+  localStorage.setItem("sessionId", s._id);   // 🔥 ADD THIS
+  navigate(`/interview-prep/${s._id}`);
+}}
               onDelete={() =>
                 setOpenDeleteAlert({
                   open: true,
@@ -491,9 +495,32 @@ const Dashboard = () => {
         hideHeader
       >
         <div className="p-6 text-center">
-          <h2 className="text-white">Delete this session?</h2>
-          <button onClick={handleDeleteSession}>Yes</button>
-        </div>
+  <h2 className="text-gray-800 text-lg font-semibold mb-4">
+    Delete this session?
+  </h2>
+
+  <div className="flex justify-center gap-4 mt-4">
+    
+    {/* ❌ CANCEL BUTTON */}
+    <button
+      onClick={() =>
+        setOpenDeleteAlert({ open: false, data: null })
+      }
+      className="px-5 py-2 rounded-md bg-gray-500 text-white hover:scale-105 transition"
+    >
+      Cancel
+    </button>
+
+    {/* ✅ DELETE BUTTON */}
+    <button
+      onClick={handleDeleteSession}
+      className="px-5 py-2 rounded-md bg-red-500 text-white hover:scale-105 transition"
+    >
+      Delete
+    </button>
+
+  </div>
+</div>
       </Modal>
 
     </DashboardLayout>

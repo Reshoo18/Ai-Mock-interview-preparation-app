@@ -50,6 +50,7 @@ import VideoCall from "./pages/VideoCall"; // 🔥 ADD THIS
 import MeetingPage from "./pages/MeetingPage";
 import UserProvider from './context/userContext';
 import InterviewSession from "./pages/InterviewSession.jsx";
+import InterviewSetup from "./pages/InterviewPrep/InterviewSetup";
 
 
 const App = () => {
@@ -71,7 +72,13 @@ const App = () => {
           {/* 🔥 VIDEO CALL ROUTE */}
           <Route path="/call/:sessionId" element={<VideoCall />} />
           <Route path="/meeting" element={<MeetingPage />} />
-          <Route path="/interview/start/:id" element={<InterviewSession />} />
+          {/* <Route path="/interview/start/:id" element={<InterviewSession />} /> */}
+          <Route
+  path="/interview/start"
+  element={<InterviewSession />}
+/>
+          <Route path="/interview/setup"  element={<InterviewSetup />}
+                  />
 
         </Routes>
 
