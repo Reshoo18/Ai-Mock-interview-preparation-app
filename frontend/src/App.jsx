@@ -51,6 +51,7 @@ import MeetingPage from "./pages/MeetingPage";
 import UserProvider from './context/userContext';
 import InterviewSession from "./pages/InterviewSession.jsx";
 import InterviewSetup from "./pages/InterviewPrep/InterviewSetup";
+import ATSChecker from "./pages/ATSChecker";
 
 
 const App = () => {
@@ -78,7 +79,9 @@ const App = () => {
   element={<InterviewSession />}
 />
           <Route path="/interview/setup"  element={<InterviewSetup />}
+          
                   />
+          <Route path="/ats-checker" element={<ATSChecker />} />
 
         </Routes>
 

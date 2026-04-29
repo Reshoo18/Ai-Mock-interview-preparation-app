@@ -15,6 +15,7 @@ const authRoutes = require("./routes/authRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const { evaluateAnswer } = require("./controllers/aiController");
+const atsRoutes = require("./routes/atsRoutes");
 
 const { protect } = require("./middlewares/authMiddleware.js");
 const {
@@ -91,6 +92,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/questions", questionRoutes);
+app.use("/api/ats", atsRoutes);
 
 // 🤖 AI Routes
 app.post(
