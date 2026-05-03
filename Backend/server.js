@@ -11,112 +11,200 @@ const connectDB = require("./config/db.js");
 const authRoutes = require("./routes/authRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const questionRoutes = require("./routes/questionRoutes");
-const { evaluateAnswer } = require("./controllers/aiController");
 const atsRoutes = require("./routes/atsRoutes");
 
-const { protect } = require("./middlewares/authMiddleware.js");
 const {
+  evaluateAnswer,
   generateInterviewQuestion,
   generateConceptExplanation,
-} = require("./controllers/aiController.js");
+} = require("./controllers/aiController");
+
+const { protect } = require("./middlewares/authMiddleware.js");
 
 const app = express();
 
-// 🔥 CREATE HTTP SERVER (IMPORTANT)
+
+// ======================================================
+// CREATE HTTP SERVER
+// ======================================================
 const server = http.createServer(app);
 
-// 🔥 SOCKET.IO SETUP
+
+// ======================================================
+// SOCKET.IO
+// ======================================================
 const io = new Server(server, {
   cors: {
     origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
-// 🔥 SOCKET EVENTS (VIDEO CALL SIGNALING)
+
+// ======================================================
+// SOCKET EVENTS
+// ======================================================
 io.on("connection", (socket) => {
+
   console.log("User connected:", socket.id);
 
-  // Join room
+  // =========================
+  // JOIN ROOM
+  // =========================
   socket.on("join-room", (roomId) => {
+
     socket.join(roomId);
+
+    // EXISTING USERS
+    const users = Array.from(
+      io.sockets.adapter.rooms.get(roomId) || []
+    ).filter((id) => id !== socket.id);
+
+    // SEND EXISTING USERS
+    socket.emit("all-users", users);
+
+    // NOTIFY OTHERS
     socket.to(roomId).emit("user-joined", socket.id);
+
+    console.log(
+      `Socket ${socket.id} joined room ${roomId}`
+    );
   });
 
-  // WebRTC offer
+  // =========================
+  // OFFER
+  // =========================
   socket.on("offer", ({ offer, to }) => {
+
     io.to(to).emit("offer", {
       offer,
       from: socket.id,
     });
   });
 
-  // WebRTC answer
+  // =========================
+  // ANSWER
+  // =========================
   socket.on("answer", ({ answer, to }) => {
+
     io.to(to).emit("answer", {
       answer,
       from: socket.id,
     });
   });
 
-  // ICE candidates
+  // =========================
+  // ICE CANDIDATE
+  // =========================
   socket.on("ice-candidate", ({ candidate, to }) => {
+
     io.to(to).emit("ice-candidate", {
       candidate,
       from: socket.id,
     });
   });
 
+  // =========================
+  // DISCONNECT
+  // =========================
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+
+    console.log(
+      "User disconnected:",
+      socket.id
+    );
   });
 });
 
-// 🔧 Middleware
+
+// ======================================================
+// MIDDLEWARE
+// ======================================================
 app.use(express.json());
 
 app.use(
   cors({
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
 
-// 🔗 Connect DB
+
+// ======================================================
+// DATABASE
+// ======================================================
 connectDB();
 
-// 📌 Routes
+
+// ======================================================
+// ROUTES
+// ======================================================
 app.use("/api/auth", authRoutes);
 app.use("/api/sessions", sessionRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/ats", atsRoutes);
 
-// 🤖 AI Routes
+
+// ======================================================
+// AI ROUTES
+// ======================================================
 app.post(
   "/api/ai/generate-question",
   protect,
   generateInterviewQuestion
 );
+
 app.post(
   "/api/ai/generate-explanation",
   protect,
   generateConceptExplanation
 );
 
-app.post("/api/ai/evaluate", evaluateAnswer);
+app.post(
+  "/api/ai/evaluate",
+  evaluateAnswer
+);
 
-// 📁 Static uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// 🧪 Test route
+// ======================================================
+// STATIC UPLOADS
+// ======================================================
+app.use(
+  "/uploads",
+  express.static(
+    path.join(__dirname, "uploads")
+  )
+);
+
+
+// ======================================================
+// TEST ROUTE
+// ======================================================
 app.post("/test-body", (req, res) => {
+
   console.log(req.body);
+
   res.json(req.body);
 });
 
-// 🚀 START SERVER (IMPORTANT: server.listen)
-const PORT = process.env.PORT || 5000;
+
+// ======================================================
+// START SERVER
+// ======================================================
+const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+  console.log(
+    `🚀 Server running on port ${PORT}`
+  );
 });

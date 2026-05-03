@@ -46,7 +46,7 @@ import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Home/Dashboard";
 import InterviewPrep from "./pages/InterviewPrep/Interviewprep";
 import LandingPage from "./pages/LandingPage";
-import VideoCall from "./pages/VideoCall"; // 🔥 ADD THIS
+import VideoCall from "./pages/VideoCall.jsx"; // 🔥 ADD THIS
 import MeetingPage from "./pages/MeetingPage";
 import UserProvider from './context/userContext';
 import InterviewSession from "./pages/InterviewSession.jsx";

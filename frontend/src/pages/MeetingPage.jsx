@@ -2,19 +2,30 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const MeetingPage = () => {
-  const navigate = useNavigate();
-  const [roomId, setRoomId] = useState("");
 
-  // create new meeting
+  const navigate = useNavigate();
+
+  const [roomId, setRoomId] =
+    useState("");
+
+  // CREATE
   const createMeeting = () => {
-    const newRoom = Math.random().toString(36).substring(2, 8);
-    navigate(`/call/${newRoom}`);
+
+    const id =
+      Math.random()
+        .toString(36)
+        .substring(2, 8);
+
+    console.log("NEW ROOM:", id);
+
+    navigate(`/call/${id}`);
   };
 
-  // join existing meeting
+  // JOIN
   const joinMeeting = () => {
+
     if (!roomId.trim()) {
-      alert("Enter Room ID ❌");
+      alert("Enter Room ID");
       return;
     }
 
@@ -22,39 +33,52 @@ const MeetingPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#111827] to-black">
 
-      <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[350px]">
+      <div className="w-[430px] bg-white/10 backdrop-blur-xl rounded-3xl p-10 border border-white/10 shadow-2xl">
 
-        <h2 className="text-xl font-semibold text-center mb-6">
-          🎥 Video Meeting
-        </h2>
+        {/* ICON */}
+        <div className="flex justify-center mb-5">
+          <div className="bg-green-500 p-5 rounded-2xl text-4xl">
+            🎥
+          </div>
+        </div>
+
+        {/* TITLE */}
+        <h1 className="text-white text-5xl font-bold text-center">
+          Video Meeting
+        </h1>
+
+        <p className="text-zinc-300 text-center mt-3 mb-8">
+          Create or join a meeting instantly
+        </p>
 
         {/* CREATE */}
         <button
           onClick={createMeeting}
-          className="w-full mb-4 py-2 bg-green-500 rounded-lg hover:bg-green-400 transition"
+          className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl text-2xl font-semibold transition"
         >
-          ➕ Create Meeting
+          + Create Meeting
         </button>
 
-        {/* JOIN */}
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            placeholder="Enter Room ID"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            className="px-3 py-2 rounded-lg bg-black/40 border border-white/20 outline-none"
-          />
+        {/* INPUT */}
+        <input
+          type="text"
+          placeholder="Enter Room ID"
+          value={roomId}
+          onChange={(e) =>
+            setRoomId(e.target.value)
+          }
+          className="w-full mt-6 px-5 py-4 rounded-2xl bg-[#1e293b] text-white text-xl outline-none border border-zinc-700"
+        />
 
-          <button
-            onClick={joinMeeting}
-            className="py-2 bg-blue-500 rounded-lg hover:bg-blue-400 transition"
-          >
-            🔗 Join Meeting
-          </button>
-        </div>
+        {/* JOIN */}
+        <button
+          onClick={joinMeeting}
+          className="w-full mt-6 bg-blue-500 hover:bg-blue-600 text-white py-4 rounded-2xl text-2xl font-semibold transition"
+        >
+          🔗 Join Meeting
+        </button>
 
       </div>
     </div>
