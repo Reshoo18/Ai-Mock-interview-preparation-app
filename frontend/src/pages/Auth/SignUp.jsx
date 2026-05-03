@@ -142,7 +142,7 @@
 
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../../component/Inputs/input";
+import Input from "../../Component/Inputs/Input.jsx";
 import ProfilePhotoSelector from "../../component/Inputs/ProfilePhotoSelector";
 import { validateEmail } from "../../utils/helper";
 import { UserContext } from "../../context/userContext";
