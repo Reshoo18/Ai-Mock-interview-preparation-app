@@ -486,7 +486,12 @@ const Dashboard = () => {
         onClose={() => setOpenCreateModal(false)}
         hideHeader
       >
-        <CreateSessionForm onSuccess={fetchSessions} />
+<CreateSessionForm 
+  onSuccess={() => {
+    fetchSessions();
+    setOpenCreateModal(false); // 🔥 modal close karega
+  }} 
+/>
       </Modal>
 
       <Modal

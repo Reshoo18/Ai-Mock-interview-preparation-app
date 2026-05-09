@@ -1,32 +1,66 @@
+// apiPaths.js
 
 export const BASE_URL = "http://localhost:8000";
 
 export const API_PATHS = {
+
   AUTH: {
-    REGISTER: "/api/auth/register",
-    LOGIN: "/api/auth/login",
-    GET_PROFILE: "/api/auth/profile",
+
+    REGISTER:
+      "/api/auth/register",
+
+    LOGIN:
+      "/api/auth/login",
+
+    GET_PROFILE:
+      "/api/auth/profile",
+
+    UPDATE_PROFILE:
+      "/api/auth/update-profile",
+
+    UPDATE_PROFILE_PHOTO:
+      "/api/auth/update-profile-photo",
   },
 
   IMAGE: {
-    UPLOAD_IMAGE: "/api/auth/upload-image",
+
+    UPLOAD_IMAGE:
+      "/api/auth/upload-image",
   },
 
   AI: {
-    GENERATE_QUESTION: "/api/ai/generate-question",
-    GENERATE_EXPLAINATION: "/api/ai/generate-explanation",
+
+    GENERATE_QUESTION:
+      "/api/ai/generate-question",
+
+    GENERATE_EXPLAINATION:
+      "/api/ai/generate-explanation",
   },
 
   SESSION: {
-    CREATE: "/api/sessions/create",
-    GET_ALL: "/api/sessions/my-sessions",
-    GET_ONE: (id) => `/api/sessions/${id}`,
-    DELETE: (id) => `/api/sessions/${id}`,
+
+    CREATE:
+      "/api/sessions/create",
+
+    GET_ALL:
+      "/api/sessions/my-sessions",
+
+    GET_ONE: (id) =>
+      `/api/sessions/${id}`,
+
+    DELETE: (id) =>
+      `/api/sessions/${id}`,
   },
 
   QUESTIONS: {
-    ADD_TO_SESSIONS: "/api/questions/add",
-    PIN: (id) => `/api/questions/${id}/pin`,
-    UPDATE_NOTE: (id) => `/api/questions/${id}/note`,
+
+    ADD_TO_SESSIONS:
+      "/api/questions/add",
+
+    PIN: (id) =>
+      `/api/questions/${id}/pin`,
+
+    UPDATE_NOTE: (id) =>
+      `/api/questions/${id}/note`,
   },
 };

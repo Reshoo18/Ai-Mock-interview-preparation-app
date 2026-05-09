@@ -465,12 +465,13 @@ const VideoCall = () => {
     devices.getTracks().forEach(track => track.stop());
 
     // NAVIGATE
-    navigate("/meeting");
+    // navigate("/meeting");
 
-    // FORCE PAGE RELOAD
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    // // FORCE PAGE RELOAD
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 100);
+    navigate("/meeting", { replace: true });
 
   } catch (err) {
     console.log(err);
