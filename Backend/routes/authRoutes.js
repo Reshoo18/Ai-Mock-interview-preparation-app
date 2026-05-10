@@ -10,6 +10,8 @@ const {
 
   updateProfile,
   updateProfilePhoto,
+  sendOtp,
+  verifyOtp
 
 } = require("../controllers/authController");
 
@@ -51,6 +53,16 @@ router.put(
   protect,
   upload.single("profileImage"),
   updateProfilePhoto
+);
+
+router.post(
+  "/send-otp",
+  sendOtp
+);
+
+router.post(
+  "/verify-otp",
+  verifyOtp
 );
 
 // IMAGE UPLOAD

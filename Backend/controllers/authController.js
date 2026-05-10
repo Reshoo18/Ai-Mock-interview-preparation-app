@@ -6,6 +6,12 @@ const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
 
+const Otp =
+  require("../models/Otp");
+
+const sendOtpEmail =
+  require("../utils/sendOtpEmail");
+
 
 // GENERATE TOKEN
 const generateToken = (userId) => {
@@ -310,6 +316,108 @@ const updateProfilePhoto =
     }
   };
 
+  const sendOtp = async (
+  req,
+  res
+) => {
+    console.log(process.env.EMAIL_USER);
+console.log(process.env.EMAIL_PASS);
+  try {
+
+    const { email } =
+      req.body;
+
+    const otp =
+      Math.floor(
+        100000 +
+          Math.random() *
+            900000
+      ).toString();
+
+    await Otp.deleteMany({
+      email,
+    });
+
+    await Otp.create({
+
+      email,
+
+      otp,
+
+      expiresAt:
+        Date.now() +
+        5 * 60 * 1000,
+    });
+
+    await sendOtpEmail(
+      email,
+      otp
+    );
+
+    res.json({
+      success: true,
+      message:
+        "OTP sent successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message:
+        error.message,
+    });
+  }
+};
+
+
+const verifyOtp = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const { email, otp } =
+      req.body;
+
+    const existingOtp =
+      await Otp.findOne({
+        email,
+        otp,
+      });
+
+    if (!existingOtp) {
+
+      return res.status(400).json({
+        message:
+          "Invalid OTP",
+      });
+    }
+
+    if (
+      existingOtp.expiresAt <
+      Date.now()
+    ) {
+
+      return res.status(400).json({
+        message:
+          "OTP expired",
+      });
+    }
+
+    res.json({
+      success: true,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message:
+        error.message,
+    });
+  }
+};
+
 
 module.exports = {
 
@@ -324,4 +432,6 @@ module.exports = {
   updateProfilePhoto,
 
   generateToken,
+  sendOtp,
+verifyOtp
 };
