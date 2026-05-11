@@ -18,7 +18,7 @@ import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import Modal from "../component/Modal";
 // no change
-import ProfileInfoCard from "../component/Cards/ProfileInfoCard";
+import ProfileInfoCard from "../component/Cards_temp/ProfileInfoCard";
 
 const LandingPage = () => {
   const { user } = useContext(UserContext);
