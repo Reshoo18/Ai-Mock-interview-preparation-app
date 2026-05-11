@@ -19,10 +19,25 @@ const extractPDFText = (filePath) => {
 
         pdfData.Pages.forEach((page) => {
           page.Texts.forEach((textItem) => {
-            text +=
-              decodeURIComponent(
+
+            try {
+              if (
+                textItem.R &&
+                textItem.R[0] &&
                 textItem.R[0].T
-              ) + " ";
+              ) {
+                text +=
+                  decodeURIComponent(
+                    textItem.R[0].T
+                  ) + " ";
+              }
+            } catch (error) {
+              console.log(
+                "Skipping malformed text:",
+                error.message
+              );
+            }
+
           });
         });
 
