@@ -599,7 +599,8 @@
 
 // export default SignUp;
 
-import { useState, useContext } from "react";
+
+  import { useState, useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -634,21 +635,10 @@ const SignUp = ({ setCurrentPage }) => {
   const [password, setPassword] =
     useState("");
 
-  const [otp, setOtp] =
-    useState("");
-
-  const [showOtpModal, setShowOtpModal] =
-    useState(false);
-
-  const [isVerified, setIsVerified] =
-    useState(false);
-
   const [error, setError] =
     useState("");
 
-  // =========================================
   // IMAGE UPLOAD
-  // =========================================
   const uploadImage = async (
     imageFile
   ) => {
@@ -676,111 +666,7 @@ const SignUp = ({ setCurrentPage }) => {
     return res.data;
   };
 
-  // =========================================
-  // SEND OTP
-  // =========================================
-  const handleSendOtp =
-    async () => {
-
-      if (
-        !validateEmail(email)
-      ) {
-
-        setError(
-          "Please enter valid email"
-        );
-
-        return;
-      }
-
-      try {
-
-        setError("");
-
-        const response =
-          await axiosInstance.post(
-            API_PATHS.AUTH.SEND_OTP,
-            {
-              email,
-            }
-          );
-
-        console.log(
-          "OTP RESPONSE:",
-          response.data
-        );
-
-        setShowOtpModal(true);
-
-        alert(
-          "OTP sent successfully"
-        );
-
-      } catch (err) {
-
-        console.log(
-          "OTP ERROR:",
-          err
-        );
-
-        setError(
-          err?.response?.data
-            ?.message ||
-            "Failed to send OTP"
-        );
-      }
-    };
-
-  // =========================================
-  // VERIFY OTP
-  // =========================================
-  const handleVerifyOtp =
-    async () => {
-
-      try {
-
-        setError("");
-
-        const response =
-          await axiosInstance.post(
-            API_PATHS.AUTH.VERIFY_OTP,
-            {
-              email,
-              otp,
-            }
-          );
-
-        console.log(
-          "VERIFY RESPONSE:",
-          response.data
-        );
-
-        setIsVerified(true);
-
-        setShowOtpModal(false);
-
-        alert(
-          "Email verified successfully"
-        );
-
-      } catch (err) {
-
-        console.log(
-          "VERIFY ERROR:",
-          err
-        );
-
-        setError(
-          err?.response?.data
-            ?.message ||
-            "Invalid OTP"
-        );
-      }
-    };
-
-  // =========================================
   // SIGNUP
-  // =========================================
   const handleSignUP =
     async () => {
 
@@ -810,15 +696,6 @@ const SignUp = ({ setCurrentPage }) => {
 
         setError(
           "Please enter the password."
-        );
-
-        return;
-      }
-
-      if (!isVerified) {
-
-        setError(
-          "Please verify your email first."
         );
 
         return;
@@ -897,178 +774,105 @@ const SignUp = ({ setCurrentPage }) => {
 
   return (
 
-    <>
-      <div className="w-[90vw] md:w-[33vw] p-7 flex flex-col justify-center">
+    <div className="w-[90vw] md:w-[33vw] p-7 flex flex-col justify-center">
 
-        <h3 className="text-lg font-semibold text-black">
-          Create an Account
-        </h3>
+      <h3 className="text-lg font-semibold text-black">
+        Create an Account
+      </h3>
 
-        <p className="text-xs text-slate-700 mt-[5px] mb-6">
-          Join us today by entering your details below.
-        </p>
+      <p className="text-xs text-slate-700 mt-[5px] mb-6">
+        Join us today by entering your details below.
+      </p>
 
-        <div>
+      <div>
 
-          <ProfilePhotoSelector
-            image={profilePic}
-            setImage={setProfilePic}
+        <ProfilePhotoSelector
+          image={profilePic}
+          setImage={setProfilePic}
+        />
+
+        <div className="grid grid-cols-1 gap-2">
+
+          <Input
+            value={fullName}
+            onChange={({
+              target,
+            }) =>
+              setFullName(
+                target.value
+              )
+            }
+            label="Full Name"
+            placeholder="John"
+            type="text"
           />
 
-          <div className="grid grid-cols-1 gap-2">
+          <Input
+            value={email}
+            onChange={({
+              target,
+            }) =>
+              setEmail(
+                target.value
+              )
+            }
+            label="Email Address"
+            placeholder="john@example.com"
+            type="text"
+          />
 
-            <Input
-              value={fullName}
-              onChange={({
-                target,
-              }) =>
-                setFullName(
-                  target.value
-                )
-              }
-              label="Full Name"
-              placeholder="John"
-              type="text"
-            />
+          <Input
+            value={password}
+            onChange={({
+              target,
+            }) =>
+              setPassword(
+                target.value
+              )
+            }
+            label="Password"
+            placeholder="Min. 8 characters"
+            type="password"
+          />
 
-            <Input
-              value={email}
-              onChange={({
-                target,
-              }) =>
-                setEmail(
-                  target.value
-                )
-              }
-              label="Email Address"
-              placeholder="john@example.com"
-              type="text"
-            />
+        </div>
 
-            {/* SEND OTP BUTTON */}
-            <button
-              type="button"
-              onClick={
-                handleSendOtp
-              }
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold mt-2"
-            >
-              {isVerified
-                ? "Email Verified ✅"
-                : "Send OTP"}
-            </button>
+        {error && (
 
-            <Input
-              value={password}
-              onChange={({
-                target,
-              }) =>
-                setPassword(
-                  target.value
-                )
-              }
-              label="Password"
-              placeholder="Min. 8 characters"
-              type="password"
-            />
+          <p className="text-red-500 text-xs pb-2.5 mt-2">
+            {error}
+          </p>
+        )}
 
-          </div>
+        <button
+          type="button"
+          className="btn-primary mt-3"
+          onClick={
+            handleSignUP
+          }
+        >
+          SIGN UP
+        </button>
 
-          {error && (
+        <p className="text-[13px] text-slate-800 mt-3">
 
-            <p className="text-red-500 text-xs pb-2.5 mt-2">
-              {error}
-            </p>
-          )}
+          Already have an account?{" "}
 
           <button
             type="button"
-            className="btn-primary mt-3"
-            onClick={
-              handleSignUP
+            className="font-medium text-primary underline cursor-pointer"
+            onClick={() =>
+              setCurrentPage(
+                "login"
+              )
             }
           >
-            SIGN UP
+            Log In
           </button>
 
-          <p className="text-[13px] text-slate-800 mt-3">
-
-            Already have an account?{" "}
-
-            <button
-              type="button"
-              className="font-medium text-primary underline cursor-pointer"
-              onClick={() =>
-                setCurrentPage(
-                  "login"
-                )
-              }
-            >
-              Log In
-            </button>
-
-          </p>
-        </div>
+        </p>
       </div>
-
-      {/* OTP MODAL */}
-      {showOtpModal && (
-
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-
-          <div className="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl">
-
-            <h2 className="text-2xl font-bold text-black">
-              Verify OTP
-            </h2>
-
-            <p className="text-sm text-slate-600 mt-2">
-              Enter the OTP sent to your email.
-            </p>
-
-            <div className="mt-5">
-
-              <Input
-                value={otp}
-                onChange={({
-                  target,
-                }) =>
-                  setOtp(
-                    target.value
-                  )
-                }
-                label="OTP"
-                placeholder="Enter 6-digit OTP"
-                type="text"
-              />
-
-            </div>
-
-            <button
-              onClick={
-                handleVerifyOtp
-              }
-              className="btn-primary w-full mt-4"
-            >
-              Verify OTP
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                setShowOtpModal(
-                  false
-                )
-              }
-              className="w-full mt-3 py-3 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
-            >
-              Cancel
-            </button>
-
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

@@ -1,18 +1,11 @@
-
-
-
 const express = require("express");
 
 const {
   registerUser,
   loginUser,
   getUserProfile,
-
   updateProfile,
   updateProfilePhoto,
-  sendOtp,
-  verifyOtp
-
 } = require("../controllers/authController");
 
 const { protect } =
@@ -55,16 +48,6 @@ router.put(
   updateProfilePhoto
 );
 
-router.post(
-  "/send-otp",
-  sendOtp
-);
-
-router.post(
-  "/verify-otp",
-  verifyOtp
-);
-
 // IMAGE UPLOAD
 router.post(
   "/upload-image",
@@ -72,6 +55,7 @@ router.post(
   (req, res) => {
 
     if (!req.file) {
+
       return res.status(400).json({
         message: "No file uploaded",
       });
