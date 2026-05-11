@@ -166,7 +166,7 @@ import { useState, useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import Input from "../../Component/Inputs/Input.jsx";
+import Input from "../../component/Inputs/Input.jsx";
 
 import ProfilePhotoSelector from "../../component/Inputs/ProfilePhotoSelector";
 
