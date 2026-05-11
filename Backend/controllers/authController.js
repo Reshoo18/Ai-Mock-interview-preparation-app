@@ -320,6 +320,9 @@ const updateProfilePhoto =
   req,
   res
 ) => {
+  
+  
+   console.log("SEND OTP API HIT");
     console.log(process.env.EMAIL_USER);
 console.log(process.env.EMAIL_PASS);
   try {

@@ -33,13 +33,14 @@ const sendOtpEmail = async (email, otp) => {
         <p>This OTP expires in 5 minutes.</p>
       `,
     });
-
+    console.log("BEFORE EMAIL SEND");
     console.log("OTP EMAIL SENT");
+    console.log("AFTER EMAIL SEND");
   } catch (error) {
 
     console.log("EMAIL ERROR:");
     console.log(error);
-
+    
     throw error;
   }
 };
