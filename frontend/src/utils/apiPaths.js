@@ -1,7 +1,6 @@
 // apiPaths.js
 
-export const BASE_URL = "http://localhost:8000";
-
+export const BASE_URL = "https://ai-mock-interview-preparation-app.onrender.com";
 export const API_PATHS = {
 
   AUTH: {
