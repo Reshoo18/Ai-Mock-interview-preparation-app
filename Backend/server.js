@@ -185,6 +185,12 @@ app.use(
   )
 );
 
+app.get("/ping", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend working",
+  });
+});
 
 // ======================================================
 // TEST ROUTE

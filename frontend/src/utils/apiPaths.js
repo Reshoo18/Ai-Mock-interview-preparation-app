@@ -1,6 +1,8 @@
 // apiPaths.js
 
-export const BASE_URL = "https://ai-mock-interview-preparation-app.onrender.com";
+export const BASE_URL =
+ "https://ai-mock-interview-preparation-app.onrender.com";
+
 export const API_PATHS = {
 
   AUTH: {
@@ -10,6 +12,13 @@ export const API_PATHS = {
 
     LOGIN:
       "/api/auth/login",
+
+    // ✅ ADD THESE
+    SEND_OTP:
+      "/api/auth/send-otp",
+
+    VERIFY_OTP:
+      "/api/auth/verify-otp",
 
     GET_PROFILE:
       "/api/auth/profile",
