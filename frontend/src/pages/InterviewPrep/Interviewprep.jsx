@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SpinnerLoader from "../../component/Loader/SpinnerLoader";
 import DashboardLayout from "../../component/layouts/DashboardLayout";
 import RoleInfoHeader from "./components/RoleInfoHeader";
-import QuestionCard from "../../component/Cards/QuestionCard";
+import QuestionCard from "../../component/Cards/QuestionCard.jsx";
 
 import axiosInstance from "../../utils/axiosinstance";
 import { API_PATHS } from "../../utils/apiPaths";
