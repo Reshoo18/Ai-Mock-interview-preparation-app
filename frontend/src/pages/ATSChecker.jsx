@@ -853,7 +853,7 @@ import { useState } from "react";
 
 import axios from "axios";
 
-import { BASE_URL } from "../../utils/apiPaths";
+import { BASE_URL } from "../utils/apiPaths";
 
 import {
   FileText,
