@@ -370,7 +370,7 @@ import DashboardLayout from "../../component/layouts/DashboardLayout";
 import axiosInstance from "../../utils/axiosinstance";
 import { LuPlus } from "react-icons/lu";
 import { API_PATHS } from "../../utils/apiPaths";
-import SummaryCard from "../../component/Cards_temp/SummaryCard";
+import SummaryCard from "../../component/Cards/SummaryCard";
 import Modal from "../../component/Modal";
 import { CARD_BG } from "../../utils/data";
 import moment from "moment";
