@@ -1,7 +1,7 @@
 
 
 import React from "react";
-import ProfileInfoCard from "../Cards/ProfileInfoCard";
+import ProfileInfoCard from "../Cards/ProfileInfoCard.jsx";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
