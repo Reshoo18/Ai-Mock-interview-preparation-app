@@ -1,78 +1,47 @@
 const nodemailer = require("nodemailer");
 
 const sendOtpEmail = async (email, otp) => {
-
   try {
 
-    console.log("STEP A");
+    const transporter = nodemailer.createTransport({
 
-    console.log(
-      "EMAIL_USER:",
-      process.env.EMAIL_USER
-    );
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
 
-    console.log(
-      "EMAIL_PASS:",
-      process.env.EMAIL_PASS
-    );
+      requireTLS: true,
 
-   const transporter = nodemailer.createTransport({
-  service: "gmail",
+      tls: {
+        family: 4,
+        rejectUnauthorized: false,
+      },
 
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  family: 4,
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Interview Prep AI OTP",
 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+      html: `
+        <h2>Your OTP Code</h2>
+        <h1>${otp}</h1>
+        <p>This OTP expires in 5 minutes.</p>
+      `,
+    });
 
-    console.log("STEP B");
-
-    const info =
-      await transporter.sendMail({
-
-        from:
-          process.env.EMAIL_USER,
-
-        to: email,
-
-        subject:
-          "Interview Prep AI OTP",
-
-        html: `
-          <h2>Your OTP Code</h2>
-
-          <h1>${otp}</h1>
-
-          <p>
-            This OTP expires in 5 minutes.
-          </p>
-        `,
-      });
-
-    console.log("STEP C");
-
-    console.log(
-      "Email sent:",
-      info.response
-    );
-
+    console.log("OTP EMAIL SENT");
   } catch (error) {
 
-    console.log(
-      "EMAIL ERROR:"
-    );
-
+    console.log("EMAIL ERROR:");
     console.log(error);
 
     throw error;
   }
 };
 
-module.exports =
-  sendOtpEmail;
+module.exports = sendOtpEmail;
